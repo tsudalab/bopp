@@ -16,6 +16,7 @@ from keras.models import model_from_json
 from mpi4py import MPI
 import sys,os 
 from multiprocessing import Pool
+from HMUtil import writefasta,writesubmitoakforest,execHM 
 #from MDutil.embedding import *
 
 
@@ -98,9 +99,14 @@ def loadRNN(path,filename):
     return loadRNN
 
 # evaluation step using homology modeling and MD simulation
-def evaluate(seq):
+def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib):
+    jobid=execHM(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib)
     
     return valpospep
+
+#check for waiting job
+def waitcheck(jobid,qstatcmd):
+    
 
 # updating the neural network
 def RNNupdate(model,seq):
@@ -118,6 +124,13 @@ if __name__ == "__main__":
     geninter=1000
     genepoch=1000
     wd="test3-0_999"
+    HPC=True
+    HPCtype=1
+    HMpath="/work/gk73/k73003/software/I-TASSER5.1/I-TASSERmod/runI-TASSER.pl"
+    HMlib="/work/gk73/k73003/software/I-TASSER5.1/libdir"
+    GMXpath=""
+    GMXlib=""
+    
     #comm = MPI.COMM_WORLD
     #rank = comm.Get_rank()
     #call generator and classifier
