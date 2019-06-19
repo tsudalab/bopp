@@ -473,13 +473,14 @@ def addrestrtopol(path,fn,trjpath,trjfn,toppath,topfn,prefix,jobname):
     print("#############################") 
     return  
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def execMD(acpype,GMXpath,ntomp,mpicall):
     conc=0.15
-    acpype="../acpype/scripts/acpype.py"
-    gmxpathserial="/home/k0055/k005503/software/gromacs/bin/gmx_mpi"
-    gmxpathparallel="/home/k0055/k005503/software/gromacs/bin/gmx_mpi"
-    ntomp=6 #needed for system run setting with openmp larger than 6 cores
-    mpicall="mpijob -np 12 " #calling the mpi process
+    #acpype="../acpype/scripts/acpype.py"
+    gmxpathserial=GMXpath
+    gmxpathparallel=GMXpath
+    #ntomp=6 #needed for system run setting with openmp larger than 6 cores
+    #mpicall="mpijob -np 12 " #calling the mpi process
     os.system("source ~/software/amber16/amber.sh") 
     for x in range(0,26): 
         for y in range(1,6):

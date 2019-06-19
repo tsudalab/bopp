@@ -16,8 +16,9 @@ from keras.models import model_from_json
 from mpi4py import MPI
 import sys,os 
 from multiprocessing import Pool
-from HMUtil import writefasta,writesubmitoakforest,execHM 
-#from MDutil.embedding import *
+from HMUtil.HMpara import * 
+from MDutil.embedding import *
+import time
 
 
 #predefine amino acid list. B and space is for token and padding.
@@ -98,15 +99,33 @@ def loadRNN(path,filename):
     loadRNN.load_weights(path+"/"+filename+".h5")
     return loadRNN
 
+#check for waiting job
+def waitcheck(superkonjobid,qstatcmd):
+    leftjob=1
+    while leftjob>0:
+        os.system(qstatcmd+" > currjoblist.txt ")
+        f=open("currjoblist.txt","r")
+        cjl=f.readlines()
+        f.close()
+        leftjob=0
+        for x in cjl:
+            for y in superkonjobid:
+                if y in x:
+                    leftjob=leftjob+1
+        if leftjob>0:
+            time.sleep(300)
+    return
+
 # evaluation step using homology modeling and MD simulation
-def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib):
+def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,qstatcmd):
+    #Call Homology modeling from here
     jobid=execHM(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib)
+    if HPC==True:
+        waitcheck(jobid,qstatcmd)
+    #Call MD validating from here
     
     return valpospep
 
-#check for waiting job
-def waitcheck(jobid,qstatcmd):
-    
 
 # updating the neural network
 def RNNupdate(model,seq):
@@ -128,15 +147,20 @@ if __name__ == "__main__":
     HPCtype=1
     HMpath="/work/gk73/k73003/software/I-TASSER5.1/I-TASSERmod/runI-TASSER.pl"
     HMlib="/work/gk73/k73003/software/I-TASSER5.1/libdir"
-    GMXpath=""
-    GMXlib=""
+    GMXpath="/home/k0055/k005503/software/gromacs/bin/gmx_mpi"
+    GMXconfig="source /home/k0055/k005503/software/gromacs/bin/GMXRC.bash"
+    AMBERtoolconfig="source ~/software/amber16/amber.sh"
+    acpype="../acpype/scripts/acpype.py"
+    os.system(AMBERtoolconfig)
+    os.system(GMXconfig)
+    ntomp=6 #needed for system run setting with openmp larger than 6 cores
+    mpicall="mpijob -np 12 " #calling the mpi process
     
-    #comm = MPI.COMM_WORLD
-    #rank = comm.Get_rank()
     #call generator and classifier
     pool = Pool(processes=numcore)
     pepgenerate=pool.map(actcrit,range(genepoch))
     tmppepgen=[]
+    qstatcmd="qstat -a "
     #flattening the output list out of the ranks
     for x in range(0,len(pepgenerate)):
         for y in range(0,len(pepgenerate[x])): 

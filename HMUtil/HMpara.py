@@ -8,7 +8,7 @@ def writefasta(seq,indname,wd):
     f.close()
     return 
 
-def writesubmitoakforest(indname,wd,HPCtype,HMpath,HMlib):
+def writesubmitHPC(indname,wd,HPCtype,HMpath,HMlib):
     if HPCtype==1:
         print("Going to write OakForest style queue script")
         f=open(wd+"/"+indname+"/"+indname+".jsub","w") 
@@ -107,18 +107,20 @@ def execHM(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib):
     #wd="/work/gk73/k73003/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999"
     f=open(wd+"/"+seqfn,"r")
     ln=f.readlines()
+    superkonjobid=[]
     for x in range(0,len(ln)):
         os.system("mkdir "+wd+"/"+"p3-"+str(x))
         writefasta(ln[x].strip(),"p3-"+str(x),wd)
-        writesubmitoakforest("p3-"+str(x),wd,HPCtype)
         if HPC==True:
             currwd=os.getcwd()
             os.system("cd "+wd+"/"+indname+"/")
+            writesubmitHPC("p3-"+str(x),wd,HPCtype)
             os.system("pjsub "+wd+"/"+indname+"/"+indname+".jsub")
             os.system("cd "+currwd)
             print("The job "+idname+" has been dispatched to HPC.")
+            superkonjobid.append(indname)
         else:
-            print("No HPC is selected. Proceed the HM on this system.")
+            print("No HPC is selected. Proceed the HM on this machine.")
             currwd=os.getcwd()
             os.system("cd "+wd+"/"+indname+"/")
             os.system(HMpath+" -libdir "+HMlib+" -seqname "+indname+" -datadir "+wd+"/indname"+" -runstyle gnuparallel")
