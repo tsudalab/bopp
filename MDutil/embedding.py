@@ -23,7 +23,7 @@ def protsize(path,name,wd):
         os.system("reduce -Trim "+path+"/"+name+" > "+wd+"/prot-reduce.pdb ")
     return minx,maxx,miny,maxy,minz,maxz,protcom[0]
 
-# translation of protein to fit to simulation box
+# translating protein to fit to simulation box
 def translate(prot,dx,dy,dz): 
     for x in range(0,len(prot.xyz[0])):
         prot.xyz[0][x,0]=prot.xyz[0][x,0]+dx 

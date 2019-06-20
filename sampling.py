@@ -31,9 +31,9 @@ aalen=56 #56
 
 
 # evaluation step using homology modeling and MD simulation
-def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,qstatcmd):
+def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
     #Call Homology modeling from here
-    jobid=execHM(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib)
+    jobid=execHM(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid)
     if HPC==True:
         waitcheck(jobid,qstatcmd)
     #Call MD validating from here
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     os.system(GMXconfig)
     ntomp=6 #needed for system run setting with openmp larger than 6 cores
     mpicall="mpijob -np 12 " #calling the mpi process
-    
+    groupid="gk73" #leave the groupid blank if you don't have
     #call generator and classifier
     pool = Pool(processes=numcore)
     pepgenerate=pool.map(actcrit,range(genepoch))

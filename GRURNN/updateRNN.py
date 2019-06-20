@@ -93,6 +93,7 @@ def save_model(model):
     # serialize weights to HDF5
     model.save_weights("AMPcls-GRU256-64.h5")
     print("Saved model to disk")
+    return
 
 if __name__ == "__main__":
     maxlnpep=55
