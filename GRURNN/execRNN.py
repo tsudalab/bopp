@@ -22,7 +22,6 @@ from HPCUtil.HPCtool import *
 import time
 
 
-
 #predefine amino acid list. B and space is for token and padding.
 aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
 val=aalist

@@ -16,10 +16,11 @@ from keras.models import model_from_json
 from mpi4py import MPI
 import sys,os 
 from multiprocessing import Pool
-from HMUtil.HMpara import * 
-from MDutil.embedding import *
-from HPCUtil.HPCtool import *
-from GRURNN.execRNN import *
+from HMpara import * 
+from embedding import *
+from HPCtool import *
+from execRNN import *
+from execRNN import *
 import time
 
 
@@ -28,8 +29,6 @@ aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T",
 val=aalist
 aalen=56 #56
 
-
-
 # evaluation step using homology modeling and MD simulation
 def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
     #Call Homology modeling from here
@@ -37,7 +36,8 @@ def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
     if HPC==True:
         waitcheck(jobid,qstatcmd)
     #Call MD validating from here
-    
+    if HPC==True:
+        execMD()
     return valpospep
 
 
@@ -49,7 +49,7 @@ def RNNupdate(model,seq):
 
 #main process come from here
 if __name__ == "__main__":
-    #pepgen=[]
+    #Initial parameters come from here
     aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
     cutoffrate=0.999
     numcore=8
@@ -70,6 +70,8 @@ if __name__ == "__main__":
     ntomp=6 #needed for system run setting with openmp larger than 6 cores
     mpicall="mpijob -np 12 " #calling the mpi process
     groupid="gk73" #leave the groupid blank if you don't have
+    ############End of parameters ##########################
+
     #call generator and classifier
     pool = Pool(processes=numcore)
     pepgenerate=pool.map(actcrit,range(genepoch))
