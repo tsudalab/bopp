@@ -23,11 +23,22 @@ from GRURNN.execRNN import *
 from GRURNN.execRNN import *
 import time
 
+from parameter import *
 
+###############init the service#################
+os.system(AMBERtoolconfig)
+os.system(GMXconfig)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+import tensorflow as tf
+tf.logging.set_verbosity(tf.logging.ERROR)
+##################################################
 #predefine amino acid list. B and space is for token and padding.
-aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
-val=aalist
-aalen=56 #56
+#aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
+#val=aalist
+#aalen=56 #56
+
+
 
 # evaluation step using homology modeling and MD simulation
 def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
@@ -48,30 +59,8 @@ def RNNupdate(model,seq):
 
 
 #main process come from here
-if __name__ == "__main__":
-    #Initial parameters come from here
-    aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
-    cutoffrate=0.999
-    numcore=8
-    peplength=20
-    geninter=1000
-    genepoch=1000
-    wd="test3-0_999"
-    HPC=True
-    HPCtype=1
-    HMpath="/work/gk73/k73003/software/I-TASSER5.1/I-TASSERmod/runI-TASSER.pl"
-    HMlib="/work/gk73/k73003/software/I-TASSER5.1/libdir"
-    GMXpath="/home/k0055/k005503/software/gromacs/bin/gmx_mpi"
-    GMXconfig="source /home/k0055/k005503/software/gromacs/bin/GMXRC.bash"
-    AMBERtoolconfig="source ~/software/amber16/amber.sh"
-    acpype="../acpype/scripts/acpype.py"
-    os.system(AMBERtoolconfig)
-    os.system(GMXconfig)
-    ntomp=6 #needed for system run setting with openmp larger than 6 cores
-    mpicall="mpijob -np 12 " #calling the mpi process
-    groupid="gk73" #leave the groupid blank if you don't have
-    ############End of parameters ##########################
-
+def main():
+    global aalen,aalist,val,wd,geninter,genepoch,peplength,numcore,cutoffrate
     #call generator and classifier
     pool = Pool(processes=numcore)
     pepgenerate=pool.map(actcrit,range(genepoch))
@@ -92,4 +81,4 @@ if __name__ == "__main__":
     print(tmppepgen)
     print(len(tmppepgen))
 
-
+main()

@@ -20,14 +20,17 @@ from HMUtil.HMpara import *
 from MDutil.embedding import *
 from HPCUtil.HPCtool import *
 import time
-
+from parameter import *
 
 #predefine amino acid list. B and space is for token and padding.
-aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
-val=aalist
-aalen=56 #56
+#aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
+#val=aalist
+#aalen=56 #56
+#global aalen,aalist,val,wd,geninter,genepoch,peplength,numcore,cutoffrate
 
 # sequence generating subroutine
+#def actor(actormod,pepgennum,peplength,cntint):
+#def actor(actormod,pepgennum,cntint):
 def actor(actormod,pepgennum,peplength,cntint):
     global wd,geninter,genepoch,numcore,cutoffrate
     end1="X"
@@ -50,7 +53,7 @@ def actor(actormod,pepgennum,peplength,cntint):
 
 # classification subroutine
 def critic(criticmod,intseq,cutoffrate,ep,wd):
-    global geninter,genepoch,peplength,numcore
+    #global geninter,genepoch,peplength,numcore
     cri_seq=[]
     #open file for save
     os.system("mkdir "+wd+"/ep"+str(ep))
@@ -81,9 +84,11 @@ def critic(criticmod,intseq,cutoffrate,ep,wd):
 #def actcrit(pepgen,actormod,criticmod,geninter,peplength,cutoffrate):
 def actcrit(cntint):
     global wd,geninter,genepoch,peplength,numcore,cutoffrate
+    #geninter=1000
     print("Dealing with epoch "+str(cntint))
     actormod=loadRNN("GRURNN","model-1Feb2019-GRU256-64")
     criticmod=loadRNN("GRURNN","AMPcls-GRU256-64") 
+    #print(geninter)
     gen_seq,intseq=actor(actormod,geninter,peplength,cntint)
     cri_seq=critic(criticmod,intseq,cutoffrate,cntint,wd)
     #pepgen.extend(cri_seq)
