@@ -13,14 +13,14 @@ import argparse
 import subprocess
 from keras.preprocessing import sequence
 from keras.models import model_from_json
-from mpi4py import MPI
+#from mpi4py import MPI
 import sys,os 
 from multiprocessing import Pool
-from HMpara import * 
-from embedding import *
-from HPCtool import *
-from execRNN import *
-from execRNN import *
+from HMUtil.HMpara import * 
+from MDutil.embedding import *
+from HPCUtil.HPCtool import *
+from GRURNN.execRNN import *
+from GRURNN.execRNN import *
 import time
 
 

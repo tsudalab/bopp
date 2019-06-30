@@ -13,7 +13,7 @@ import argparse
 import subprocess
 from keras.preprocessing import sequence
 from keras.models import model_from_json
-from mpi4py import MPI
+#from mpi4py import MPI
 import sys,os 
 from multiprocessing import Pool
 from HMUtil.HMpara import * 
@@ -29,6 +29,7 @@ aalen=56 #56
 
 # sequence generating subroutine
 def actor(actormod,pepgennum,peplength,cntint):
+    global wd,geninter,genepoch,numcore,cutoffrate
     end1="X"
     end2="X"
     seq=[]
@@ -49,6 +50,7 @@ def actor(actormod,pepgennum,peplength,cntint):
 
 # classification subroutine
 def critic(criticmod,intseq,cutoffrate,ep,wd):
+    global geninter,genepoch,peplength,numcore
     cri_seq=[]
     #open file for save
     os.system("mkdir "+wd+"/ep"+str(ep))
@@ -78,7 +80,7 @@ def critic(criticmod,intseq,cutoffrate,ep,wd):
 # parallelizing generator and classifier
 #def actcrit(pepgen,actormod,criticmod,geninter,peplength,cutoffrate):
 def actcrit(cntint):
-    global wd
+    global wd,geninter,genepoch,peplength,numcore,cutoffrate
     print("Dealing with epoch "+str(cntint))
     actormod=loadRNN("GRURNN","model-1Feb2019-GRU256-64")
     criticmod=loadRNN("GRURNN","AMPcls-GRU256-64") 

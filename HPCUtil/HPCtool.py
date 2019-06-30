@@ -81,13 +81,13 @@ def writequeuescript(indname,wd,HPCtype,groupid,numnode,mpiproc,mpproc,timelim):
         f.write("if ($?PBS_O_WORKDIR) then \n")
         f.write("cd ${PBS_O_WORKDIR} \n")
         f.write("set WORK=/work/users/${LOGNAME}/${PBS_JOBID} \n")
-        f.write("else   \n")
+        f.write("elif   \n")
         f.write("set WORK=/work/users/${LOGNAME}/tmp.$$ \n")
         f.write("endif \n")
         f.write("if ( ! -d ${WORK} ) mkdir ${WORK} \n")
         f.write("# \n")
         f.close()
-    else HPCtype==6:
+    elif HPCtype==6:
         print("Going to write ITO supercomputer style queue script")
         f=open(wd+"/"+indname+"/"+indname+".jsub","w") 
         f.write("#------ pjsub option --------# \n")
@@ -119,7 +119,7 @@ def HPCsubmit(indname,wd,HPCtype,groupid):  #this should be recheck again
     elif HPCtype==5:
         print("Going to submit job to IMS Molecular Simulator")
         os.system("jsub -q PN "+wd+"/"+indname+"/"+indname+".jsub")
-    else HPCtype==6:
+    elif HPCtype==6:
         print("Going to write ITO supercomputer style queue script")
         os.system("pjsub "+wd+"/"+indname+"/"+indname+".jsub")
     return 
@@ -140,7 +140,7 @@ def qstatcmd(HPCtype):  #this should be recheck again
     elif HPCtype==5:
         print("Going to submit job to IMS Molecular Simulator")
         os.system("jobinfo -c -q PN -l ")
-    else HPCtype==6:
+    elif HPCtype==6:
         print("Going to write ITO supercomputer style queue script")
         os.system("pjstat ")
     return 
