@@ -17,7 +17,7 @@ from keras.utils.np_utils import to_categorical
 from keras.preprocessing import sequence
 from keras.models import model_from_json
 from random import sample
-
+from parameter import *
 #predefine amino acid list. B and space is for token and padding.
 aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
 

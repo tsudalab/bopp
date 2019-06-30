@@ -26,6 +26,7 @@ import time
 from parameter import *
 
 ###############init the service#################
+checkparam()
 os.system(AMBERtoolconfig)
 os.system(GMXconfig)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -65,7 +66,6 @@ def main():
     pool = Pool(processes=numcore)
     pepgenerate=pool.map(actcrit,range(genepoch))
     tmppepgen=[]
-    qstatcmd="qstat -a "
     #flattening the output list out of the ranks
     for x in range(0,len(pepgenerate)):
         for y in range(0,len(pepgenerate[x])): 

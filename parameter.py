@@ -1,10 +1,10 @@
 ###############Initial parameters come from here#####################
 cutoffrate=0.999
 numcore=8
-peplength=20
+peplength=56
 geninter=1000
 genepoch=1000
-wd="test3-0_999"
+wd="../test4-0_999"
 HPC=True
 HPCtype=1
 HMpath="/work/gk73/k73003/software/I-TASSER5.1/I-TASSERmod/runI-TASSER.pl"

@@ -3,7 +3,7 @@ import os
 import mdtraj as md
 import numpy as np
 from math import *
-
+from parameter import *
 # checking protein size and protein center of mass
 def protsize(path,name,wd):
     if not os.path.isfile(path+"/"+name):

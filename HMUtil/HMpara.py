@@ -1,5 +1,6 @@
 import os
 from HPCUtil.HPCtool import *
+from parameter import *
 #from mpi4py import MPI  
 
 def writefasta(seq,indname,wd): #write selected sequence in FASTA format

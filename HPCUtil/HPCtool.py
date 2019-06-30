@@ -1,6 +1,8 @@
 from __future__ import print_function
 import time,os
 
+from parameter import *
+
 #check for waiting job
 def waitcheck(superkonjobid,qstatcmd):
     leftjob=1
@@ -144,3 +146,27 @@ def qstatcmd(HPCtype):  #this should be recheck again
         print("Going to write ITO supercomputer style queue script")
         os.system("pjstat ")
     return 
+
+def checkparam():
+    if not(os.path.exists(wd) and not(os.path.isfile(wd))):
+        print("Folder "+wd+" not exist! Please check")
+        exit()
+    if not(os.path.exists(HMpath)):
+        print("Running script for I-TASSER not exist! Please check")
+        exit()
+    if not(os.path.exists(HMlib) and not(os.path.isfile(HMlib))):
+        print("Folder "+wd+" not exist! Please check")
+        exit()       
+    if not(os.path.isfile(GMXpath) ):
+        print("GROMACS gmx execute_file not exist! Please check")
+        exit()   
+    if not(os.path.isfile(GMXconfig) ):
+        print("GROMACS config file not exist! Please check")
+        exit()   
+    if not((os.path.isfile(AMBERtoolconfig))):
+        print("AMBERTools config_file not exist! Please check")
+        exit()   
+    if not((os.path.isfile(acpype))):
+        print("acpype not exist! Please check")
+        exit()   
+    return
