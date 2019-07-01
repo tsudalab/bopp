@@ -1,10 +1,10 @@
 ###############Initial parameters come from here#####################
 cutoffrate=0.999
 numcore=8
-peplength=56
+peplength=10
 geninter=1000
 genepoch=1000
-wd="../test4-0_999"
+wd="../test-len20"
 HPC=True
 HPCtype=1
 HMpath="/work/gk73/k73003/software/I-TASSER5.1/I-TASSERmod/runI-TASSER.pl"
@@ -22,3 +22,4 @@ groupid="gk73" #leave the groupid blank if you don't have
 aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
 val=aalist
 aalen=56 #56
+dball=[] #this is for checking the database whether generated sequence is new or not 

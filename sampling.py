@@ -26,7 +26,7 @@ import time
 from parameter import *
 
 ###############init the service#################
-checkparam()
+#checkparam()
 os.system(AMBERtoolconfig)
 os.system(GMXconfig)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
