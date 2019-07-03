@@ -53,11 +53,6 @@ def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
     return valpospep
 
 
-# updating the neural network
-def RNNupdate(model,seq):
-
-    return
-
 
 #main process come from here
 def main():

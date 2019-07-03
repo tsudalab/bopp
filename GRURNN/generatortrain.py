@@ -20,7 +20,6 @@ from random import sample
 #predefine amino acid list. B and space is for token and padding.
 aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
 
-
 def seqfrmat(seqinp,maxlnpep):
     #remove the tailing nextline character and adding token and padding seq
     #print(aalist)
@@ -78,34 +77,56 @@ def loaddata(csvpath,maxlnpep):
     f.close()
     return clnpep,clncoding
 
-def save_model(model):
-    # serialize model to JSON
-    model_json = model.to_json()
-    with open("model-1Feb2019-GRU256-64.json", "w") as json_file:
-        json_file.write(model_json)
-    # serialize weights to HDF5
-    model.save_weights("model-1Feb2019-GRU256-64.h5")
-    print("Saved model to disk")
 
-if __name__ == "__main__":
-    maxlnpep=55
-    nproc=4
-    X_data,Y_data=loaddata("../AMP-data/AMP-data-clean.csv",maxlnpep)
-    X=np.array((X_data))
-    Y= np.array((Y_data))
-    #initialize NN model
-    model = Sequential()
-    aalstln=len(aalist)
-    print(aalstln)
-    dataln=X.shape[1]
-    print(dataln)
-    print(X.shape)
-    model.add(Embedding(input_dim=aalstln, output_dim=len(aalist), input_length=dataln,mask_zero=False))
-    model.add(GRU(units=256, activation='tanh',return_sequences=True,dropout=0.2))
-    model.add(GRU(units=64, activation='tanh',return_sequences=True,dropout=0.2))
-    model.add(TimeDistributed(Dense(aalstln, activation='softmax')))
-    optimizer=Adam(lr=0.00001) # try much smaller one 0.001 0.00001
-    print(model.summary())
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
-    model.fit(X,Y,epochs=2000, batch_size=512,validation_split=0.1)
-    save_model(model)
+class generator:
+    def __init__(self,path,filename,updateseq):
+        self.train=self.inittrain()
+        self.load=self.loadRNN()
+        self.update=self.optimize()
+        self.model=network
+
+    def save_model(self,model,path,filename):
+        # serialize model to JSON
+        model_json = model.to_json()
+        with open(path+"/"+filename+".json", "w") as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        model.save_weights(path+"/"+filename+".h5")
+        print("Saved model to disk")
+        return
+
+    def inittrain(self,path,filename):
+        maxlnpep=55
+        nproc=4
+        X_data,Y_data=loaddata("../AMP-data/AMP-data-clean.csv",maxlnpep)
+        X=np.array((X_data))
+        Y= np.array((Y_data))
+        #initialize NN model
+        model = Sequential()
+        aalstln=len(aalist)
+        print(aalstln)
+        dataln=X.shape[1]
+        print(dataln)
+        print(X.shape)
+        model.add(Embedding(input_dim=aalstln, output_dim=len(aalist), input_length=dataln,mask_zero=False))
+        model.add(GRU(units=256, activation='tanh',return_sequences=True,dropout=0.2))
+        model.add(GRU(units=64, activation='tanh',return_sequences=True,dropout=0.2))
+        model.add(TimeDistributed(Dense(aalstln, activation='softmax')))
+        optimizer=Adam(lr=0.00001) # try much smaller one 0.001 0.00001
+        print(model.summary())
+        model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+        model.fit(X,Y,epochs=2000, batch_size=512,validation_split=0.1)
+        save_model(model,path,filename)
+        return
+
+    # neural network model loading
+    def loadRNN(self,path,filename):
+        json_file = open(path+"/"+filename+".json","r")
+        RNNjson = json_file.read()
+        json_file.close()
+        loadRNN = model_from_json(RNNjson)
+        loadRNN.load_weights(path+"/"+filename+".h5")
+        return loadRNN
+
+    def optimize(self,model,path,filename,updateseq): 
+        
