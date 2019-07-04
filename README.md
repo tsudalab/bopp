@@ -10,12 +10,11 @@ Prerequisite:
 - Keras
 - Numpy
 - Multiprocessing
-
-MD evaluation requires:
-- I-TASSER
-- GROMACS
-- AMBERTOOLs
-- This option is time-consuming, considering using on HPC is saving-life.
+- MD evaluation requires:
+-- I-TASSER
+-- GROMACS
+-- AMBERTOOLs
+-- This option is time-consuming, considering using on HPC is saving-life.
 
 Before running:
 - Setting the parameters in parameter.py is required. There are explanation inside the file.
