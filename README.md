@@ -8,3 +8,8 @@ To run:
 - just call: 
 
 `python sampling.py`
+
+
+Prerequisite:
+
+
