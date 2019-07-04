@@ -483,7 +483,7 @@ def execMD(peprange,wd,acpype,GMXpath,ntomp,mpicall,indname,HPCtype,groupid):
     #mpicall="mpijob -np 12 " #calling the mpi process
     #os.system("source ~/software/amber16/amber.sh") 
     superkonjobid=[]
-    for x in range(0,2range(peprange)): 
+    for x in range(0,range(peprange)): 
         for y in range(1,6):
             if os.path.isfile(wd+"/p3-"+str(x)+"/"+"model"+str(y)+".pdb"):  
                 jobname="amp"+str(x)+"-"+str(y)
