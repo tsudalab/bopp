@@ -48,9 +48,10 @@ def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
     if HPC==True:
         waitcheck(jobid,qstatcmd)
     #Call MD validating from here
+    jobid=execMD(len(seqsel),wd,acpype,GMXpath,ntomp,mpicall)
     if HPC==True:
-        execMD()
-    return valpospep
+        waitcheck(jobid,qstatcmd)
+    return valpospep,valnegpep
 
 
 

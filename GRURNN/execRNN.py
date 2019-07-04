@@ -13,7 +13,7 @@ import argparse
 import subprocess
 from keras.preprocessing import sequence
 from keras.models import model_from_json
-#from mpi4py import MPI
+import gc 
 import sys,os 
 from multiprocessing import Pool
 from HMUtil.HMpara import * 
@@ -84,15 +84,17 @@ def critic(criticmod,intseq,cutoffrate,ep,wd):
 #def actcrit(pepgen,actormod,criticmod,geninter,peplength,cutoffrate):
 def actcrit(cntint):
     global wd,geninter,genepoch,peplength,numcore,cutoffrate
-    #geninter=1000
     print("Dealing with epoch "+str(cntint))
     actormod=loadRNN("GRURNN","model-1Feb2019-GRU256-64")
     criticmod=loadRNN("GRURNN","AMPcls-GRU256-64") 
-    #print(geninter)
     gen_seq,intseq=actor(actormod,geninter,peplength,cntint)
     cri_seq=critic(criticmod,intseq,cutoffrate,cntint,wd)
-    #pepgen.extend(cri_seq)
-    #print(pepgen)
+    #########clean trash after playing############
+    K.clear_session()
+    gc.collect()
+    del actormod
+    del criticmod
+    ##############################################
     return cri_seq 
 
 # neural network model loading
@@ -103,3 +105,5 @@ def loadRNN(path,filename):
     loadRNN = model_from_json(RNNjson)
     loadRNN.load_weights(path+"/"+filename+".h5")
     return loadRNN
+
+

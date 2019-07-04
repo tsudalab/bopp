@@ -59,11 +59,12 @@ def loaddata(csvpath,csvpathneg,maxlnpep):
     datacutoff=0
     f=open("../AMP-data/RNN-dropoutdata-3Mar2019-GRU256-64.csv","w")
     #seqlist=sample(range(0,lenln),lenln-1000)
-    seqlist=sample(range(0,lenln),lenln)  
-    seqlistneg=sample(range(0,lenlnn),lenlnn)
+    #seqlist=sample(range(0,lenln),lenln)  
+    #seqlistneg=sample(range(0,lenlnn),lenlnn)
     for i in range(0,lenln):
         print("process sequence "+str(i)+" over "+str(lenln))
-        if (len(ln[i])<=maxlnpep)&(i in seqlist):
+        #if (len(ln[i])<=maxlnpep)&(i in seqlist):
+        if (len(ln[i])<=maxlnpep):
             frmseq,frmcod=seqfrmat(ln[i],maxlnpep)
             #frmcod=to_categorical(1, num_classes=2,dtype="int32")
             frmcod=[[1]]
@@ -73,7 +74,8 @@ def loaddata(csvpath,csvpathneg,maxlnpep):
             f.write(ln[i].strip()+"X"+"\n")
     for i in range(0,lenlnn):
         print("process negative sequence "+str(i)+" over "+str(lenlnn))
-        if (len(ln[i])<=maxlnpep)&(i in seqlistneg):
+        #if (len(ln[i])<=maxlnpep)&(i in seqlistneg):
+        if (len(lnn[i])<=maxlnpep):
             frmseq,frmcod=seqfrmat(lnn[i],maxlnpep)
             #frmcod=to_categorical(0, num_classes=2,dtype="int32")
             frmcod=[[0]]
@@ -83,6 +85,82 @@ def loaddata(csvpath,csvpathneg,maxlnpep):
             f.write(lnn[i].strip()+"X"+"\n")
     f.close()
     return clnpep,clncoding
+
+def save_model(model,path,filename):
+    # serialize model to JSON
+    model_json = model.to_json()
+    with open(path+"/"+filename+".json", "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights(path+"/"+filename+".h5")
+    print("Saved model to disk")
+
+def inittrain():
+    maxlnpep=55
+    nproc=4
+    X_data,Y_data=loaddata("../AMP-data/AMP-data-clean.csv","../AMP-data/nAMP_natrl.csv",maxlnpep)
+    X=np.array((X_data))
+    Y= np.array((Y_data))
+    #initialize NN model
+    model = Sequential()
+    aalstln=len(aalist)
+    print(aalstln)
+    dataln=X.shape[1]
+    print(dataln)
+    print(X.shape)
+    print(Y.shape)
+    model.add(Embedding(input_dim=aalstln, output_dim=len(aalist), input_length=dataln,mask_zero=False))
+    model.add(GRU(output_dim=256, activation='tanh',return_sequences=True))
+    model.add(Dropout(0.2))
+    model.add(Dense(1, activation='sigmoid')) 
+    model.add(MaxPooling1D(pool_size=52))
+    optimizer=Adam(lr=0.00001) # try much smaller one 0.001 0.00001
+    print(model.summary())
+    model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    model.fit(X,Y,epochs=3000, batch_size=512,validation_split=0.1)
+    save_model(model,path,filename) 
+
+    # neural network model loading
+def loadRNN(path,filename):
+    json_file = open(path+"/"+filename+".json","r")
+    RNNjson = json_file.read()
+    json_file.close()
+    loadRNN = model_from_json(RNNjson)
+    loadRNN.load_weights(path+"/"+filename+".h5")
+    return loadRNN
+
+def updateRNN(model,path,filename,updateposseq,updatenegseq):
+    #process the string
+    clnpep=[]
+    clncoding=[]
+    ln=updateseq
+    lenln=len(updateposseq)
+    lenlnn=len(updatenegseq)
+    for i in range(0,lenln):
+        print("process sequence "+str(i)+" over "+str(lenln))
+        #if (len(ln[i])<=maxlnpep)&(i in seqlist):
+        if (len(ln[i])<=maxlnpep):
+            frmseq,frmcod=seqfrmat(ln[i],maxlnpep)
+            #frmcod=to_categorical(1, num_classes=2,dtype="int32")
+            frmcod=[[1]]
+            clnpep.append(frmseq)
+            clncoding.append(frmcod)
+    for i in range(0,lenlnn):
+        print("process negative sequence "+str(i)+" over "+str(lenlnn))
+        #if (len(ln[i])<=maxlnpep)&(i in seqlistneg):
+        if (len(lnn[i])<=maxlnpep):
+            frmseq,frmcod=seqfrmat(lnn[i],maxlnpep)
+            #frmcod=to_categorical(0, num_classes=2,dtype="int32")
+            frmcod=[[0]]
+            clnpep.append(frmseq)
+            clncoding.append(frmcod)
+    X_data=clnpep
+    Y_data=clncloning
+    X=np.array((X_data))
+    Y= np.array((Y_data))
+    model.fit(X,Y)
+    save_model(model,path,filename)
+    return model
 
 class classifier:
     def __init__(self,path,filename):
