@@ -32,7 +32,6 @@ def writequeuescript(indname,wd,HPCtype,groupid,numnode,mpiproc,mpproc,timelim):
         f.write("#PJM -L elapse="+timelim+" \n")
         f.write("#PJM -g "+groupid+" \n")
         f.write("#------- Program execution -------# \n")
-        #f.write("source /work/gk73/k73003/bashrc3 \n")
         f.close()
     elif HPCtype==2:
         print("Going to write ISSP supercomputer style queue script")
@@ -72,7 +71,6 @@ def writequeuescript(indname,wd,HPCtype,groupid,numnode,mpiproc,mpproc,timelim):
         f.write("#PJM -L elapse="+timelim+" \n")
         f.write("#PJM -g "+groupid+" \n")
         f.write("#------- Program execution -------# \n")
-        #f.write("source /work/gk73/k73003/bashrc3 \n")
         f.close()
     elif HPCtype==5:
         print("Going to write IMS Molecular Simulator style queue script")
@@ -102,7 +100,6 @@ def writequeuescript(indname,wd,HPCtype,groupid,numnode,mpiproc,mpproc,timelim):
         f.write("#------- Program execution -------# \n")
         f.write("source /work/gk73/k73003/bashrc3 \n")
         f.close()
-        #os.system("pjsub "+wd+"/"+indname+"/"+indname+".jsub")
     return 
 
 def HPCsubmit(indname,wd,HPCtype,groupid):  #this should be recheck again 

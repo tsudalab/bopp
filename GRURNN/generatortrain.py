@@ -22,8 +22,6 @@ aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T",
 
 def seqfrmat(seqinp,maxlnpep):
     #remove the tailing nextline character and adding token and padding seq
-    #print(aalist)
-    #tmp=seqinp.strip()
     tmp=seqinp.strip()+"X"
     while len(tmp)<=maxlnpep:
         tmp=tmp+" "
@@ -31,13 +29,10 @@ def seqfrmat(seqinp,maxlnpep):
     coding=[]
     seqid=[]
     for x in range(0,maxlnpep+1):
-        #print(tmp[x])
         tmpctgr=to_categorical(aalist.index(tmp[x]), num_classes=len(aalist),dtype="int32")
-        #print(tmpctgr)
         coding.append(tmpctgr) 
         seqid.append(aalist.index(tmp[x]))
     print("length of coding is "+str(len(coding)))
-    #print(seqid)
     return seqid,coding
 
 def homopepgen():
@@ -104,7 +99,7 @@ def inittrain(path,filename):
     model.add(GRU(units=256, activation='tanh',return_sequences=True,dropout=0.2))
     model.add(GRU(units=64, activation='tanh',return_sequences=True,dropout=0.2))
     model.add(TimeDistributed(Dense(aalstln, activation='softmax')))
-    optimizer=Adam(lr=0.00001) # try much smaller one 0.001 0.00001
+    optimizer=Adam(lr=0.00001) 
     print(model.summary())
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
     model.fit(X,Y,epochs=2000, batch_size=512,validation_split=0.1)
@@ -180,7 +175,7 @@ class generator:
         model.add(GRU(units=256, activation='tanh',return_sequences=True,dropout=0.2))
         model.add(GRU(units=64, activation='tanh',return_sequences=True,dropout=0.2))
         model.add(TimeDistributed(Dense(aalstln, activation='softmax')))
-        optimizer=Adam(lr=0.00001) # try much smaller one 0.001 0.00001
+        optimizer=Adam(lr=0.00001) 
         print(model.summary())
         model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
         model.fit(X,Y,epochs=2000, batch_size=512,validation_split=0.1)

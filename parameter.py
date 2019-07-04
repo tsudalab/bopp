@@ -14,6 +14,7 @@ HMlib="/work/gk73/k73003/software/I-TASSER5.1/libdir"
 GMXpath="/home/k0055/k005503/software/gromacs/bin/gmx_mpi"
 GMXpathmpi="mpijob /home/k0055/k005503/software/gromacs/bin/gmx_mpi"
 GMXconfig="source /home/k0055/k005503/software/gromacs/bin/GMXRC.bash"
+conc=0.15 #concentration of ions
 AMBERtoolconfig="source ~/software/amber16/amber.sh"
 acpype="../acpype/scripts/acpype.py"
 genmod="model-1Feb2019-GRU256-64"

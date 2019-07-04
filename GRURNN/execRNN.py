@@ -22,15 +22,7 @@ from HPCUtil.HPCtool import *
 import time
 from parameter import *
 
-#predefine amino acid list. B and space is for token and padding.
-#aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T","W","Y","V","X"," "]
-#val=aalist
-#aalen=56 #56
-#global aalen,aalist,val,wd,geninter,genepoch,peplength,numcore,cutoffrate
 
-# sequence generating subroutine
-#def actor(actormod,pepgennum,peplength,cntint):
-#def actor(actormod,pepgennum,cntint):
 def actor(actormod,pepgennum,peplength,cntint):
     global wd,geninter,genepoch,numcore,cutoffrate
     end1="X"
@@ -62,7 +54,6 @@ def critic(criticmod,intseq,cutoffrate,ep,wd):
     #iterating through all the generated sequence
     for i in range(0,len(intseq)):
         x=np.reshape(intseq[i],(1,len(intseq[i])))
-        #print(x)
         x_pad= sequence.pad_sequences(x, maxlen=aalen, dtype='int32',padding='post', truncating='pre', value=22.0)
         predictions=criticmod.predict(x_pad)
         # save all the generated sequence with probability

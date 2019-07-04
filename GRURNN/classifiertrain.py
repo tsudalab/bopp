@@ -23,8 +23,6 @@ aalist=["B","A","R","N","D","C","Q","E","G","H","I","L","K","M","F","P","S","T",
 
 def seqfrmat(seqinp,maxlnpep):
     #remove the tailing nextline character and adding token and padding seq
-    #print(aalist)
-    #tmp=seqinp.strip()
     tmp=seqinp.strip()+"X"
     while len(tmp)<=maxlnpep:
         tmp=tmp+" "
@@ -32,13 +30,10 @@ def seqfrmat(seqinp,maxlnpep):
     coding=[]
     seqid=[]
     for x in range(0,maxlnpep+1):
-        #print(tmp[x])
         tmpctgr=to_categorical(aalist.index(tmp[x]), num_classes=len(aalist),dtype="int32")
-        #print(tmpctgr)
         coding.append(tmpctgr) 
         seqid.append(aalist.index(tmp[x]))
     print("length of coding is "+str(len(coding)))
-    #print(seqid)
     return seqid,coding
 
 def loaddata(csvpath,csvpathneg,maxlnpep): 
@@ -58,15 +53,10 @@ def loaddata(csvpath,csvpathneg,maxlnpep):
     #clean the line and add begin token and space padding to the data array
     datacutoff=0
     f=open("../AMP-data/RNN-dropoutdata-3Mar2019-GRU256-64.csv","w")
-    #seqlist=sample(range(0,lenln),lenln-1000)
-    #seqlist=sample(range(0,lenln),lenln)  
-    #seqlistneg=sample(range(0,lenlnn),lenlnn)
     for i in range(0,lenln):
         print("process sequence "+str(i)+" over "+str(lenln))
-        #if (len(ln[i])<=maxlnpep)&(i in seqlist):
         if (len(ln[i])<=maxlnpep):
             frmseq,frmcod=seqfrmat(ln[i],maxlnpep)
-            #frmcod=to_categorical(1, num_classes=2,dtype="int32")
             frmcod=[[1]]
             clnpep.append(frmseq)
             clncoding.append(frmcod)
@@ -74,10 +64,8 @@ def loaddata(csvpath,csvpathneg,maxlnpep):
             f.write(ln[i].strip()+"X"+"\n")
     for i in range(0,lenlnn):
         print("process negative sequence "+str(i)+" over "+str(lenlnn))
-        #if (len(ln[i])<=maxlnpep)&(i in seqlistneg):
         if (len(lnn[i])<=maxlnpep):
             frmseq,frmcod=seqfrmat(lnn[i],maxlnpep)
-            #frmcod=to_categorical(0, num_classes=2,dtype="int32")
             frmcod=[[0]]
             clnpep.append(frmseq)
             clncoding.append(frmcod)
@@ -148,7 +136,6 @@ def updateclassifier(path,filename,updateposseq,updatenegseq):
             clncoding.append(frmcod)
     for i in range(0,lenlnn):
         print("process negative sequence "+str(i)+" over "+str(lenlnn))
-        #if (len(ln[i])<=maxlnpep)&(i in seqlistneg):
         if (len(lnn[i])<=maxlnpep):
             frmseq,frmcod=seqfrmat(lnn[i],maxlnpep)
             #frmcod=to_categorical(0, num_classes=2,dtype="int32")
@@ -203,7 +190,7 @@ class classifier:
         model.add(Dropout(0.2))
         model.add(Dense(1, activation='sigmoid')) 
         model.add(MaxPooling1D(pool_size=52))
-        optimizer=Adam(lr=0.00001) # try much smaller one 0.001 0.00001
+        optimizer=Adam(lr=0.00001) 
         print(model.summary())
         model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
         model.fit(X,Y,epochs=3000, batch_size=512,validation_split=0.1)
