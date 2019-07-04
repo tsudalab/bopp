@@ -11,5 +11,8 @@ To run:
 
 
 Prerequisite:
-
+Tensorflow, Keras
+MD evaluation requires:
+I-TASSER
+GROMACS, AMBERTOOLs
 
