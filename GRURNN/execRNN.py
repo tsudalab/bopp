@@ -85,8 +85,8 @@ def critic(criticmod,intseq,cutoffrate,ep,wd):
 def actcrit(cntint):
     global wd,geninter,genepoch,peplength,numcore,cutoffrate
     print("Dealing with epoch "+str(cntint))
-    actormod=loadRNN("GRURNN","model-1Feb2019-GRU256-64")
-    criticmod=loadRNN("GRURNN","AMPcls-GRU256-64") 
+    actormod=loadRNN("GRURNN",genmod)
+    criticmod=loadRNN("GRURNN",clasmod) 
     gen_seq,intseq=actor(actormod,geninter,peplength,cntint)
     cri_seq=critic(criticmod,intseq,cutoffrate,cntint,wd)
     #########clean trash after playing############

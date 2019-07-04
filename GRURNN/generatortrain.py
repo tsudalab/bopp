@@ -120,12 +120,13 @@ def loadRNN(path,filename):
     loadRNN.load_weights(path+"/"+filename+".h5")
     return loadRNN
 
-def updateRNN(model,path,filename,updateseq):
+def updategenerator(path,filename,updateseq):
     #process the string
     clnpep=[]
     clncoding=[]
     ln=updateseq
     lenln=len(updateseq)
+    model=loadRNN(path,filename)
     for i in range(0,lenln):
         print("process sequence "+str(i)+" over "+str(lenln))
     if (len(ln[i])<=maxlnpep)&(i in seqlist)&(ln[i].strip() not in homopep):
@@ -138,7 +139,12 @@ def updateRNN(model,path,filename,updateseq):
     Y= np.array((Y_data))
     model.fit(X,Y)
     save_model(model,path,filename)
-    return model
+    #########clean trash after playing############
+    K.clear_session()
+    gc.collect()
+    del model
+    ##############################################
+    return
 
 class generator:
     def __init__(self,path,filename,updateseq):

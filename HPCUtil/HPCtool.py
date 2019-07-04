@@ -169,4 +169,16 @@ def checkparam():
     if not((os.path.isfile(acpype))):
         print("acpype not exist! Please check")
         exit()   
+    if not((os.path.isfile("GRURNN/"+genmod+".json")):
+        print("Generator RNN model does not exist! Please check")
+        exit()   
+    if not((os.path.isfile("GRURNN/"+clasmod+".json")):
+        print("Classifier RNN model does not exist! Please check")
+        exit()   
+    if not((os.path.isfile("GRURNN/"+genmod+".h5")):
+        print("Generator RNN model does not exist! Please check")
+        exit()   
+    if not((os.path.isfile("GRURNN/"+clasmod+".h5")):
+        print("Classifier RNN model does not exist! Please check")
+        exit()   
     return
