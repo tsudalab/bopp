@@ -6,4 +6,4 @@ sampling.py is the main script.
 
 To run:
 - just call:
-python sampling.py
+`python sampling.py`
