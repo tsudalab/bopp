@@ -5,5 +5,5 @@ Parameter.py contains the mandatory parameters to run this script
 sampling.py is the main script. 
 
 To run:
-- just call:
+- just call: \n
 `python sampling.py`
