@@ -18,7 +18,7 @@ MD evaluation requires:
 
 
 # Before running:
-- Setting the parameters in parameter.py is required. There are explanation inside the file.
+- Setting the parameters in parameter.py is required. There are explanations inside the file.
 
 # To run:
 
