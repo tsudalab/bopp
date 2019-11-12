@@ -1,8 +1,9 @@
+from __future__ import print_function
 import os
 import mdtraj as md
 import numpy as np
 from math import *
-
+from parameter import *
 # checking protein size and protein center of mass
 def protsize(path,name,wd):
     if not os.path.isfile(path+"/"+name):
@@ -18,11 +19,10 @@ def protsize(path,name,wd):
         maxz=np.max(prot.xyz[0][:,2])
         protcom=md.compute_center_of_mass(prot)
         #process pdb with AMBERTool
-        #os.system("pdb4amber -i "+path+"/"+name+" -o "+wd+"/prot-reduce.pdb --reduce --dry")
         os.system("reduce -Trim "+path+"/"+name+" > "+wd+"/prot-reduce.pdb ")
     return minx,maxx,miny,maxy,minz,maxz,protcom[0]
 
-# translation of protein to fit to simulation box
+# translating protein to fit to simulation box
 def translate(prot,dx,dy,dz): 
     for x in range(0,len(prot.xyz[0])):
         prot.xyz[0][x,0]=prot.xyz[0][x,0]+dx 
@@ -30,37 +30,6 @@ def translate(prot,dx,dy,dz):
         prot.xyz[0][x,2]=prot.xyz[0][x,2]+dz
     return prot
 
-######################remove overlapping with protein (this should be deprecated) ##################
-def overlapremove(pdb,prot,wd):  
-    # create index list 
-    protid=prot.top.select("all")
-    watid=pdb.top.select("(resname WAT) or (resname KI) or (resname CLI)")
-    table, bonds = pdb.top.to_dataframe()
-    print(table.head())
-    overlap=[]
-    # compute the distance with water
-    dislist=[]
-    for x in range(0,len(watid)):
-        for y in range(0,len(protid)):
-            dislist.append([watid[x],protid[y]])
-    dist=md.compute_distances(pdb,dislist)  
-    print(dist)
-    for x in range(0,len(watid)):
-        print(dislist[:][0])
-        if dist[np.where(dislist[0][:]==watid[x])[0]].min()<3.5:
-            overlap.extend(pdb.top.select("(chainid 1) and (index "+str(watid[x])+")"))
-    print(overlap)
-    overlap=list(set(overlap))
-    nonoverlap=pdb.top.select("all")
-    print(nonoverlap)
-    for x in range(0,len(overlap)):
-        index = np.argwhere(nonoverlap==overlap[x])
-        nonoverlap=np.delete(nonoverlap,index)
-    print(nonoverlap)
-    pdbcut=pdb.atom_slice(nonoverlap)
-    pdbcut.save_pdb(wd+"/lipprot_nonoverlap.pdb")
-    return overlap
-##################################(this should be deprecated) ####################################
 
 # remove overlapping with protein
 def addter(pdb,wd,conc,jobname):  
@@ -130,7 +99,6 @@ def addter(pdb,wd,conc,jobname):
     f.write("set complex box { "+str(xdim)+" "+str(ydim)+" "+str(zdim)+" } \n")
     if solvateions:
         f.write("solvateBox complex TIP3PBOX {0.0 0.0 20.0}  1.0 \n") 
-        #f.write("solvateBox complex TIP3PBOX 20.0 \n") 
         vol=xdim*ydim*zdim
         ions=int(conc*6.023*0.0001*vol)
         print(str(ions)+" ions need to keep "+str(conc)+"M concentration.")    
@@ -150,7 +118,6 @@ def addter(pdb,wd,conc,jobname):
     makendx(wd,pdb[:-4]+"amber.pdb",wd,pdb[:-4]+"amber.pdb",pdb[:-4])
     addrestrtopol(wd,pdb[:-4]+"amber_GMX.top",wd,pdb[:-4]+"amber_GMX.gro",wd,pdb[:-4]+"amber.pdb",pdb[:-4],jobname)
     # create the run file for GROMACS
-    
     return
 
 # insert protein to lipid simulation box
@@ -185,10 +152,7 @@ def insertion(path,name,lipidpath,lipidname,wd,conc,jobname):
             nonoverlap=[]
             rescheck=True
             protlip=prot.stack(lipid.atom_slice(lipid.top.select("(resname CHL) or (resname OL) or (resname PA) or (resname PC)")))
-            #protlip=prot.stack(lipid)
             protlip.save_pdb(wd+"/"+name[:-4]+"protlip.pdb")
-            #protlip=md.load("protlip.pdb")
-            #overlapid=addter(wd+"/"+name[:-4]+"protlip.pdb",wd,conc,jobname)
             overlapid=addter(name[:-4]+"protlip.pdb",wd,conc,jobname)
     return
 
@@ -316,10 +280,6 @@ def nptposrewrite(path,fn,temp,press):
     f.write("tau_t		            = 0.4 0.4 0.4  \n")
     f.write("ref_t	                = {:8.3f} {:8.3f} {:8.3f}	 \n".format(temp,temp,temp)) 
     f.write("pcoupl		         = berendsen	 \n") 
-    #f.write("pcoupltype	         = semiisotropic  \n")
-    #f.write("tau_p		         = 2.0	 \n") 
-    #f.write("compressibility		         = 4.5e-5  4.5e-5   \n")
-    #f.write("ref_p    = {:8.3f} {:8.3f}  \n".format(press,press) )
     f.write("pcoupltype                 = isotropic  \n")
     f.write("tau_p                      = 2.0   \n")
     f.write("compressibility                    =  4.5e-5   \n")
@@ -361,12 +321,6 @@ def smdposrewrite(path,fn,temp,press):
     f.write("tc-grps	            = Protein Lipid Sol	 \n") 
     f.write("tau_t		            = 0.4 0.4 0.4  \n")
     f.write("ref_t	                = {:8.3f} {:8.3f} {:8.3f}	 \n".format(temp,temp,temp)) 
-    #f.write("pcoupl		         = berendsen	 \n") 
-    #f.write("pcoupltype	         = semiisotropic  \n")
-    #f.write("tau_p		         = 2.0	 \n") 
-    #f.write("compressibility		         = 4.5e-5  4.5e-5    \n")
-    #f.write("ref_p     = {:8.3f} {:8.3f}  \n".format(press,press) )
-    #f.write("refcoord-scaling	 = com	 \n") 
     f.write("pbc	                = xyz	 \n") 
     f.write("DispCorr	            = EnerPres   \n")
     f.write("gen_vel		        = no	 \n") 
@@ -382,60 +336,17 @@ def smdposrewrite(path,fn,temp,press):
     f.close()   
     return
 
-def writeissprun(path,fn,prefix,jobname):
+def writerun(path,fn,prefix,jobname):
     f=open(path+"/"+fn,"w") 
-    f.write("#!/bin/bash \n")  
-    f.write("#QSUB -queue B18acc \n")
-    f.write("#QSUB -node 8 \n")
-    f.write("#QSUB -mpi 32 \n")
-    f.write("#QSUB -omp 6 \n")
-    f.write("#QSUB -place distribute \n")
-    f.write("#QSUB -over false \n")
-    f.write("#PBS -l walltime=5:59:00 \n")
-    f.write("#QSUB -place distribute \n")
-    f.write("#PBS -N "+jobname+" \n")
-    f.write("cd $PBS_O_WORKDIR  \n")  
-    f.write(". /etc/profile.d/modules.sh  \n")  
-    f.write("module unload intel/16.0.1.150 mpt/2.12 gnu/4.8.5 cuda/7.0  \n")  
-    f.write("export GMX_MAXBACKUP=-1  \n")  
-    f.write("module load intel/15.0.0.090 intel-mpi/5.0.3.048 intel-mkl/15.0.0.090 gnu/4.8.5 cuda/7.0  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"em.mdp -c "+path+"/"+prefix+"amber_GMX.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"em.tpr -maxwarn 10   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"em -v  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"nvt.mdp -c "+path+"/"+prefix+"em.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"nvt.tpr -maxwarn 10   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"nvt -v  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"npt.mdp -c "+path+"/"+prefix+"nvt.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"npt.tpr -maxwarn 1   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"npt -v  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"smd.mdp -c "+path+"/"+prefix+"npt.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"smd.tpr -maxwarn 1   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"smd -v  \n") 
+    f.write(GMXpath+" grompp -f "+path+"/"+prefix+"em.mdp -c "+path+"/"+prefix+"amber_GMX.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"em.tpr -maxwarn 10   \n")
+    f.write(GMXpathmpi+" mdrun -deffnm "+path+"/"+prefix+"em -v  \n")
+    f.write(GMXpath+" grompp -f "+path+"/"+prefix+"nvt.mdp -c "+path+"/"+prefix+"em.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"nvt.tpr -maxwarn 10   \n")
+    f.write(GMXpathmpi+" mdrun -deffnm "+path+"/"+prefix+"nvt -v  \n")
+    f.write(GMXpath+" grompp -f "+path+"/"+prefix+"npt.mdp -c "+path+"/"+prefix+"nvt.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"npt.tpr -maxwarn 1   \n")
+    f.write(GMXpathmpi+" mdrun -deffnm "+path+"/"+prefix+"npt -v  \n")
+    f.write(GMXpath+" grompp -f "+path+"/"+prefix+"smd.mdp -c "+path+"/"+prefix+"npt.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"smd.tpr -maxwarn 1   \n")
+    f.write(GMXpathmpi+" mdrun -deffnm "+path+"/"+prefix+"smd -v  \n") 
     f.close()  
-    return
-
-def writeissprunrestrt(path,fn,prefix,jobname):
-    f=open(path+"/"+fn,"w")
-    f.write("#!/bin/bash \n")
-    f.write("#QSUB -queue F18acc \n")
-    f.write("#QSUB -node 8 \n")
-    f.write("#QSUB -mpi 32 \n")
-    f.write("#QSUB -omp 6 \n")
-    f.write("#QSUB -place distribute \n")
-    f.write("#QSUB -over false \n")
-    f.write("#PBS -l walltime=23:59:00 \n")
-    f.write("#QSUB -place distribute \n")
-    f.write("#PBS -N "+jobname+" \n")
-    f.write("cd $PBS_O_WORKDIR  \n")
-    f.write(". /etc/profile.d/modules.sh  \n")
-    f.write("module unload intel/16.0.1.150 mpt/2.12 gnu/4.8.5 cuda/7.0  \n")
-    f.write("export GMX_MAXBACKUP=-1  \n")
-    f.write("module load intel/15.0.0.090 intel-mpi/5.0.3.048 intel-mkl/15.0.0.090 gnu/4.8.5 cuda/7.0  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"em.mdp -c "+path+"/"+prefix+"amber_GMX.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"em.tpr -maxwarn 10   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"em -v  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"nvt.mdp -c "+path+"/"+prefix+"em.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"nvt.tpr -maxwarn 10   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"nvt -v  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"npt.mdp -c "+path+"/"+prefix+"nvt.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"npt.tpr -maxwarn 1   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"npt -v  \n")
-    f.write("~/software/gromacs/bin/gmx_gpu5.1.2 grompp -f "+path+"/"+prefix+"smd.mdp -c "+path+"/"+prefix+"npt.gro -p "+path+"/"+prefix+"amber_GMX.top -n "+path+"/"+prefix+"index.ndx -o "+path+"/"+prefix+"smd.tpr -maxwarn 10   \n")
-    f.write("mpijob ~/software/gromacs/bin/gmx_gpu5.1.2 mdrun -deffnm "+path+"/"+prefix+"smd -v  \n")
-    f.close() 
     return
 
 
@@ -467,27 +378,31 @@ def addrestrtopol(path,fn,trjpath,trjfn,toppath,topfn,prefix,jobname):
     nvtposrewrite(path,prefix+"nvt.mdp",300.0)
     nptposrewrite(path,prefix+"npt.mdp",300.0,1.0)
     smdposrewrite(path,prefix+"smd.mdp",300.0,1.0)
-    writeissprun(path,prefix+".qsub",prefix,jobname)  
     print("#############################")
     print("Finishing submitting the script file "+path+"/"+prefix+".qsub")   
     print("#############################") 
     return  
 
-if __name__ == "__main__":
-    conc=0.15
-    acpype="../acpype/scripts/acpype.py"
-    gmxpathserial="/home/k0055/k005503/software/gromacs/bin/gmx_mpi"
-    gmxpathparallel="/home/k0055/k005503/software/gromacs/bin/gmx_mpi"
-    ntomp=6 #needed for system run setting with openmp larger than 6 cores
-    mpicall="mpijob -np 12 " #calling the mpi process
-    os.system("source ~/software/amber16/amber.sh") 
-    for x in range(0,26): 
+#if __name__ == "__main__":
+def execMD(peprange,wd,acpype,GMXpath,ntomp,mpicall,indname,HPCtype,groupid):
+    gmxpathserial=GMXpath
+    gmxpathparallel=GMXpath
+    superkonjobid=[]
+    for x in range(0,range(peprange)): 
         for y in range(1,6):
-            if os.path.isfile("/work/k0055/k005503/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999/p3-"+str(x)+"/"+"model"+str(y)+".pdb"):  
+            if os.path.isfile(wd+"/p3-"+str(x)+"/"+"model"+str(y)+".pdb"):  
                 jobname="amp"+str(x)+"-"+str(y)
-                insertion("/work/k0055/k005503/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999/p3-"+str(x),"model"+str(y)+".pdb","/work/k0055/k005503/AMP-design/pepmcts-8Feb2019/actor-critic/MDutil","lipid.pdb","/work/k0055/k005503/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999/p3-"+str(x),conc,jobname)  
-                os.system("qsub /work/k0055/k005503/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999/p3-"+str(x)+"/model"+str(y)+"protlip.qsub") 
-                #writeissprunrestrt("/work/k0055/k005503/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999/p3-"+str(x),"model"+str(y)+"protlip.qsub","model"+str(y)+"protlip",jobname )   
-                #os.system("qsub /work/k0055/k005503/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999/p3-"+str(x)+"/model"+str(y)+"protlip.qsub")                 
+                superkonjobid.append(jobname)
+                insertion(wd+"/p3-"+str(x),"model"+str(y)+".pdb","MDutil","lipid.pdb",wd+"/p3-"+str(x),conc,jobname)  
+                if HPC==True:
+                    #write run script
+                    writequeuescript(indname,wd,HPCtype,groupid,numnode,mpiproc,mpproc,timelim)
+                    writerun(path,prefix+".qsub",prefix,jobname)  
+                    #submit job to HPC
+                    HPCsubmit(indname,wd,HPCtype,groupid)
+                else:
+                    writerun(path,prefix+".qsub",prefix,jobname) 
+                    os.system("sh "+path+"/"+prefix+".qsub")
+    return superkonjobid
     
 

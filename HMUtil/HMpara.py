@@ -1,34 +1,66 @@
 import os
+from HPCUtil.HPCtool import *
+from parameter import *
 #from mpi4py import MPI  
 
-def writefasta(seq,indname,wd):
+def writefasta(seq,indname,wd): #write selected sequence in FASTA format
     f=open(wd+"/"+indname+"/seq.fasta","w") 
     f.write("> seq "+indname+" \n")
     f.write(seq+"\n")
     f.close()
     return 
 
-def writesubmitoakforest(indname,wd):
-    f=open(wd+"/"+indname+"/"+indname+".jsub","w") 
-    f.write("#------ pjsub option --------# \n")
-    f.write("#PJM -L rscgrp=regular-flat \n")
-    f.write("#PJM -L node=1 \n")
-    f.write("#PJM --mpi proc=256 \n")
-    f.write("#PJM --omp thread=1 \n")
-    f.write("#PJM -L elapse=48:00:00 \n")
-    f.write("#PJM -g gk73 \n")
-    f.write("#------- Program execution -------# \n")
-    f.write("source /work/gk73/k73003/bashrc3 \n")
-    f.write("/work/gk73/k73003/software/I-TASSER5.1/I-TASSERmod/runI-TASSER.pl -libdir /work/gk73/k73003/software/I-TASSER5.1/libdir -seqname "+indname+" -datadir "+wd+"/indname"+" -runstyle gnuparallel \n")
+def writeHM2HPC(indname,wd,HPCtype,HMpath,HMlib): #append the I-TASSER command to submit script 
+    f=open(wd+"/"+indname+"/"+indname+".jsub","a") 
+    f.write(HMpath+" -libdir "+HMlib+" -seqname "+indname+" -datadir "+wd+"/indname"+" -runstyle gnuparallel \n")
     f.close()
-    os.system("pjsub "+wd+"/"+indname+"/"+indname+".jsub")
     return 
 
-if __name__ == "__main__":
-    wd="/work/gk73/k73003/AMP-design/pepmcts-8Feb2019/actor-critic/test3-0_999"
-    f=open(wd+"/genpep.txt","r")
+#if __name__ == "__main__":
+def execHMHPC(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid):  #executing the Homology Modeling stage 
+    f=open(wd+"/"+seqfn,"r")
     ln=f.readlines()
+    superkonjobid=[]
     for x in range(0,len(ln)):
         os.system("mkdir "+wd+"/"+"p3-"+str(x))
         writefasta(ln[x].strip(),"p3-"+str(x),wd)
-        writesubmitoakforest("p3-"+str(x),wd)
+        if HPC==True:
+            currwd=os.getcwd()
+            os.system("cd "+wd+"/"+indname+"/")
+            writeHM2HPC("p3-"+str(x),wd,HPCtype)
+            HPCsubmit(indname,wd,HPCtype,groupid)
+            os.system("cd "+currwd)
+            print("The job "+idname+" has been dispatched to HPC.")
+            superkonjobid.append(indname)
+        else:
+            print("No HPC is selected. Proceed the HM on this machine.")
+            currwd=os.getcwd()
+            os.system("cd "+wd+"/"+indname+"/")
+            os.system(HMpath+" -libdir "+HMlib+" -seqname "+indname+" -datadir "+wd+"/indname"+" -runstyle gnuparallel")
+            os.system("cd "+currwd)
+    return superkonjobid
+
+def execHMserial(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid):  #executing the Homology Modeling stage 
+    f=open(wd+"/"+seqfn,"r")
+    ln=f.readlines()
+    superkonjobid=[]
+    for x in range(0,len(ln)):
+        os.system("mkdir "+wd+"/"+"p3-"+str(x))
+        writefasta(ln[x].strip(),"p3-"+str(x),wd)
+        if HPC==True:
+            currwd=os.getcwd()
+            os.system("cd "+wd+"/"+indname+"/")
+            writeHM2HPC("p3-"+str(x),wd,HPCtype)
+            HPCsubmit(indname,wd,HPCtype,groupid)
+            os.system("cd "+currwd)
+            print("The job "+idname+" has been dispatched to HPC.")
+            superkonjobid.append(indname)
+        else:
+            print("No HPC is selected. Proceed the HM on this machine.")
+            currwd=os.getcwd()
+            os.system("cd "+wd+"/"+indname+"/")
+            os.system(HMpath+" -libdir "+HMlib+" -seqname "+indname+" -datadir "+wd+"/indname"+" -runstyle gnuparallel")
+            os.system("cd "+currwd)
+    return superkonjobid
+
+    
