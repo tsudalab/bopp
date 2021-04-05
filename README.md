@@ -19,6 +19,7 @@ MD evaluation requires:
 
 # Before running:
 - Setting the parameters in parameter.py is required. There are explanations inside the file.
+- We provide the setup file (setup.py) to help initialization such as installing GROMACS and AMBERTOOls. To run: ``` python setup.py ```
 
 # To run:
 

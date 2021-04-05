@@ -113,7 +113,8 @@ def addter(pdb,wd,conc,jobname):
     # call tleap to generate the file
     os.system("tleap -f "+wd+"/"+pdb[:-4]+"tleap.script")
     # call acpype to convert to GMX file
-    os.system(acpype+" -r -p "+wd+"/"+pdb[:-4]+"amber.prmtop -x "+wd+"/"+pdb[:-4]+"amber.inpcrd -b  "+wd+"/"+pdb[:-4]+"amber ")   
+    #os.system(acpype+" -r -p "+wd+"/"+pdb[:-4]+"amber.prmtop -x "+wd+"/"+pdb[:-4]+"amber.inpcrd -b  "+wd+"/"+pdb[:-4]+"amber ")   
+    os.system("amb2gro_top_gro.py -r -p "+wd+"/"+pdb[:-4]+"amber.prmtop -x "+wd+"/"+pdb[:-4]+"amber.inpcrd -b  "+wd+"/"+pdb[:-4]+"amber.pdb -t "+wd+"/"+pdb[:-4]+"amber_GMX.top -g  "+wd+"/"+pdb[:-4]+"amber_GMX.gro ")   
     # create position restraint file 
     makendx(wd,pdb[:-4]+"amber.pdb",wd,pdb[:-4]+"amber.pdb",pdb[:-4])
     addrestrtopol(wd,pdb[:-4]+"amber_GMX.top",wd,pdb[:-4]+"amber_GMX.gro",wd,pdb[:-4]+"amber.pdb",pdb[:-4],jobname)
