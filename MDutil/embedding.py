@@ -120,7 +120,6 @@ def addter(pdb,wd,conc,jobname):
     addrestrtopol(wd,pdb[:-4]+"amber_GMX.top",wd,pdb[:-4]+"amber_GMX.gro",wd,pdb[:-4]+"amber.pdb",pdb[:-4],jobname)
     # create the run file for GROMACS
     return
-
 # insert protein to lipid simulation box
 def insertion(path,name,lipidpath,lipidname,wd,conc,jobname): 
     if not os.path.isfile(lipidpath+"/"+lipidname):
