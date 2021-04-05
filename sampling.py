@@ -94,7 +94,7 @@ def main():
         if not(usereval):
             valpospep,valnegpep=evaluateMD(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
         else:
-            valpospep,valnegpep=evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd))
+            valpospep,valnegpep=evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
         #backing up the model before updating
         if x==0:
             os.system("cp GRURNN/"+genmod+".json GRURNN/"+genmod+"-cycle"+str(x)+".json")
