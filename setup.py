@@ -71,4 +71,6 @@ if GROtest==False:
     os.chdir(pwd+"/gromacs-2021.1/build")
     os.system("make -j4; make install")
     os.chdir(pwd)
+#clean trash
+os.system("rm -r test")
 

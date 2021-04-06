@@ -82,7 +82,7 @@ def main():
             mppepgen.append(pepgenerate[x][y])
     # removing the duplicates between ranks
     tmppepgen=list(set(tmppepgen))
-    save all to file
+    #save all to file
     fn=open(wd+"/genpep.txt","w")
     for x in range(0,len(tmppepgen)):
         fn.write(tmppepgen[x]+" \n")
