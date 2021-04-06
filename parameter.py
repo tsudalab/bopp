@@ -1,5 +1,5 @@
 ###############Initial parameters come from here#####################
-cutoffrate=0.999
+cutoffrate=0.999 
 numcore=8
 peplength=10
 geninter=1000
