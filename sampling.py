@@ -31,7 +31,7 @@ os.system(GMXconfig)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import tensorflow as tf
-tf.logging.set_verbosity(tf.logging.ERROR)
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 ##################################################
 
 
@@ -40,14 +40,25 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 # evaluation step using homology modeling and MD simulation
 def evaluateMD(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
     #Call Homology modeling from here
-    jobid=execHM(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid)
+    #jobid=execHM(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid)
+    #if HPC==True:
+    #    waitcheck(jobid,qstatcmd)
+    ##Call MD validating from here
+    #jobid=execMD(len(seqsel),wd,acpype,GMXpath,ntomp,mpicall)
+    #if HPC==True:
+    #    waitcheck(jobid,qstatcmd)
     if HPC==True:
+        #Call Homology modeling from here
+        jobid=execHMHPC(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid)
         waitcheck(jobid,qstatcmd)
-    #Call MD validating from here
-    jobid=execMD(len(seqsel),wd,acpype,GMXpath,ntomp,mpicall)
-    if HPC==True:
+        #Call MD validating from here
+        jobid=execMDHPC(len(seqsel),wd,acpype,GMXpath,ntomp,mpicall,HPCtype,groupid)
         waitcheck(jobid,qstatcmd)
-    
+    else:
+        #Call Homology modeling from here
+        jobid=execHMserial(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid)
+        #Call MD validating from here
+        jobid=execMDserial(len(seqsel),wd,GMXpath,ntomp,mpicall)        
     return valpospep,valnegpep
 
 #user-defined evaluation:
@@ -70,7 +81,10 @@ def main():
     global aalen,aalist,val,wd,geninter,genepoch,peplength,numcore,cutoffrate
     genmodroot=genmod
     clasmodroot=clasmod
-    #sampling the actor-critic model
+    ###########sampling the actor-critic model####################
+    #checking existence of output folder
+    if not(os.path.isdir(wd)):
+        os.system("mkdir "+wd)
     #call generator and classifier
     pool = Pool(processes=numcore)
     pepgenerate=pool.map(actcrit,range(genepoch))
@@ -79,7 +93,7 @@ def main():
     for x in range(0,len(pepgenerate)):
         for y in range(0,len(pepgenerate[x])): 
             print(pepgenerate[x][y])
-            mppepgen.append(pepgenerate[x][y])
+            tmppepgen.append(pepgenerate[x][y])
     # removing the duplicates between ranks
     tmppepgen=list(set(tmppepgen))
     #save all to file
@@ -91,9 +105,11 @@ def main():
     print(len(tmppepgen))
     #call evaluation from here:
     if not(usereval):
-        valpospep,valnegpep=evaluateMD(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
+        for seqsel in tmppepgen:
+            valpospep,valnegpep=evaluateMD(seqsel,wd,"/genpep.txt",HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
     else:
-        valpospep,valnegpep=evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
+        for seqsel in tmppepgen:
+            valpospep,valnegpep=evaluate(seqsel,wd,"/genpep.txt",HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
 
 
 main()

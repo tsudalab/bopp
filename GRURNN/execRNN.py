@@ -13,6 +13,7 @@ import argparse
 import subprocess
 from keras.preprocessing import sequence
 from keras.models import model_from_json
+import tensorflow as tf
 import gc 
 import sys,os 
 from multiprocessing import Pool
@@ -63,7 +64,7 @@ def critic(criticmod,intseq,cutoffrate,ep,wd):
             tmpseq=''.join([aalist[intseq[i][cnt]] for cnt in range(0,len(intseq[i]))])
             print("Sequence "+tmpseq+" with probability at "+str(predictions[0][0][0]))
             cri_seq.append(tmpseq)
-            if tmpseq in dbpall:
+            if tmpseq in dball:
                 print("Unfortunately, sequence is already found in databases!")
             else:
                 fncut.write(''.join([aalist[intseq[i][cnt]] for cnt in range(0,len(intseq[i]))])+" "+str(predictions[0][0][0])+" \n")
@@ -81,7 +82,8 @@ def actcrit(cntint):
     gen_seq,intseq=actor(actormod,geninter,peplength,cntint)
     cri_seq=critic(criticmod,intseq,cutoffrate,cntint,wd)
     #########clean trash after playing############
-    K.clear_session()
+    #K.clear_session()
+    tf.keras.backend.clear_session()
     gc.collect()
     del actormod
     del criticmod

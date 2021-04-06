@@ -384,7 +384,7 @@ def addrestrtopol(path,fn,trjpath,trjfn,toppath,topfn,prefix,jobname):
     return  
 
 #if __name__ == "__main__":
-def execMD(peprange,wd,acpype,GMXpath,ntomp,mpicall,indname,HPCtype,groupid):
+def execMDHPC(peprange,wd,GMXpath,ntomp,mpicall,HPCtype,groupid):
     gmxpathserial=GMXpath
     gmxpathparallel=GMXpath
     superkonjobid=[]
@@ -396,13 +396,22 @@ def execMD(peprange,wd,acpype,GMXpath,ntomp,mpicall,indname,HPCtype,groupid):
                 insertion(wd+"/p3-"+str(x),"model"+str(y)+".pdb","MDutil","lipid.pdb",wd+"/p3-"+str(x),conc,jobname)  
                 if HPC==True:
                     #write run script
-                    writequeuescript(indname,wd,HPCtype,groupid,numnode,mpiproc,mpproc,timelim)
+                    writequeuescript("/p3-"+str(x),wd,HPCtype,groupid,numnode,mpiproc,mpproc,timelim)
                     writerun(path,prefix+".qsub",prefix,jobname)  
                     #submit job to HPC
-                    HPCsubmit(indname,wd,HPCtype,groupid)
-                else:
-                    writerun(path,prefix+".qsub",prefix,jobname) 
-                    os.system("sh "+path+"/"+prefix+".qsub")
+                    HPCsubmit("/p3-"+str(x),wd,HPCtype,groupid)
     return superkonjobid
     
-
+def execMDserial(peprange,wd,GMXpath,ntomp,mpicall):
+    gmxpathserial=GMXpath
+    gmxpathparallel=GMXpath
+    superkonjobid=[]
+    for x in range(0,range(peprange)): 
+        for y in range(1,6):
+            if os.path.isfile(wd+"/p3-"+str(x)+"/"+"model"+str(y)+".pdb"):  
+                jobname="amp"+str(x)+"-"+str(y)
+                superkonjobid.append(jobname)
+                insertion(wd+"/p3-"+str(x),"model"+str(y)+".pdb","MDutil","lipid.pdb",wd+"/p3-"+str(x),conc,jobname)  
+                writerun(path,prefix+".qsub",prefix,jobname) 
+                os.system("sh "+path+"/"+prefix+".qsub")
+    return superkonjobid

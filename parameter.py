@@ -1,18 +1,18 @@
 ###############Initial parameters come from here#####################
 #cutoffrate output from the second NN
-cutoffrate=0.999 
+cutoffrate=0.5 
 #Number of for sampling within a node
 numcore=8
 #peptide length for sampling
 peplength=10
 #Generation loop within an epoch
-geninter=1000
+geninter=10
 #Number of epoch
-genepoch=1000
+genepoch=10
 #working folder for sampling
 wd="../test-len20"
 #Using HPC or not. If set to True, HPC submission is activated.
-HPC=True
+HPC=False
 #Choose the type of HPC submit script.
 #1. OakForest (UTokyo)
 #2. ISSP (UTokyo)
