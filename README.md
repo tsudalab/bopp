@@ -31,3 +31,38 @@ just call:
 python sampling.py
 ```
 
+The script will gentlely sample the sequence matching with the design goal.
+Each running epoch: it will generate the selected sequences and report:
+
+```
+equence TCNSQSIAFD with probability at 0.88409495
+Sequence MYTFTMWKNW with probability at 0.926888
+Sequence MYTFTMWKNW with probability at 0.926888
+Sequence NFEQFFYAQA with probability at 0.8918185
+Sequence KNNFMWICYG with probability at 0.9766589
+Sequence IRFHVSQSVH with probability at 0.96453977
+Sequence LRFNKQAKPS with probability at 0.9339483
+Sequence KYGIFNGGCF with probability at 0.97861457
+Sequence NFEQFFYAQA with probability at 0.8918185
+Sequence LRFNKQAKPS with probability at 0.9339483
+Sequence KYGIFNGGCF with probability at 0.97861457
+Sequence YGEIRNVKER with probability at 0.97028124
+Sequence TCNSQSIAFD with probability at 0.88409495
+Dealing with epoch 8
+Sequence NPPDADSEQF with probability at 0.7778874
+Sequence YGEIRNVKER with probability at 0.97028124
+Sequence NPPDADSEQF with probability at 0.7778874
+Sequence MWMWEFLNTY with probability at 0.9251394
+Sequence TCNSQSIAFD with probability at 0.88409495
+Sequence MYTFTMWKNW with probability at 0.926888
+Sequence MWMWEFLNTY with probability at 0.9251394
+Sequence KNNFMWICYG with probability at 0.9766589
+```
+
+After sampling the model, the selected sequence will then homology modeling by I-TASSER, you will find the generated pdb files (usually 5 models) in your selected working folder.
+
+If MD-evaluated is used, the model peptides will embeded into a membrane and execute the Steered MD through out the predefined lipid bilayers `MDUtil/lipidnew.pdb`.
+
+After running the MD simulation, the output time-course steering forces are reported in the corresponding folder.
+
+
