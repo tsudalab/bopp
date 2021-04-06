@@ -406,7 +406,7 @@ def execMDserial(peprange,wd,GMXpath,ntomp,mpicall):
     gmxpathserial=GMXpath
     gmxpathparallel=GMXpath
     superkonjobid=[]
-    for x in range(0,range(peprange)): 
+    for x in range(0,peprange): 
         for y in range(1,6):
             if os.path.isfile(wd+"/p3-"+str(x)+"/"+"model"+str(y)+".pdb"):  
                 jobname="amp"+str(x)+"-"+str(y)

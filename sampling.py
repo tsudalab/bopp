@@ -59,7 +59,7 @@ def evaluateMD(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
         jobid=execHMserial(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid)
         #Call MD validating from here
         jobid=execMDserial(len(seqsel),wd,GMXpath,ntomp,mpicall)        
-    return valpospep,valnegpep
+    return 
 
 #user-defined evaluation:
 def evaluate(seqsel,wd,seqfn,HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd):
@@ -106,10 +106,9 @@ def main():
     #call evaluation from here:
     if not(usereval):
         for seqsel in tmppepgen:
-            valpospep,valnegpep=evaluateMD(seqsel,wd,"/genpep.txt",HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
+            evaluateMD(seqsel,wd,"/genpep.txt",HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
     else:
         for seqsel in tmppepgen:
-            valpospep,valnegpep=evaluate(seqsel,wd,"/genpep.txt",HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
-
+            evaluate(seqsel,wd,"/genpep.txt",HPC,HPCtype,HMpath,HMlib,groupid,qstatcmd)
 
 main()
